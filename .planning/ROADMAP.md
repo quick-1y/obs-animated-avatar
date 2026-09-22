@@ -806,6 +806,11 @@ CI steps:
 
 **Definition of Done**: OBS loads the plugin, a solid-color source appears and can be added/deleted cleanly, CI is green, and a minimum-viable README documents the build process.
 
+**Plans:** 3 plans
+- [ ] 01-01-PLAN.md — End-to-end tracer: rename to obs-animated-avatar, register animated_avatar_source, purple 320x240 placeholder, OBS load test (tasks 1.1-1.9)
+- [ ] 01-02-PLAN.md — Build expansion: vendor nlohmann/json + stb_image, verify template CI green on Windows x64 only (tasks 1.10 + 1.11)
+- [ ] 01-03-PLAN.md — Documentation + assets expansion: D-09 placeholder character pack, initial README (task 1.12 + D-09 scaffold)
+
 ---
 
 ### Phase 2: Core Rendering Pipeline
@@ -1235,7 +1240,7 @@ CI steps:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Repository Foundation & Build System | 0/3 | Not started | - |
+| 1. Repository Foundation & Build System | 0/3 | Planned | - |
 | 2. Core Rendering Pipeline | 0/3 | Not started | - |
 | 3. Character Asset System | 0/3 | Not started | - |
 | 4. Animation System | 0/3 | Not started | - |

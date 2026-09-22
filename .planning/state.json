@@ -1,0 +1,53 @@
+{
+  "contract": "1.0.0",
+  "flavor": "core",
+  "milestone": "v1.0",
+  "phases": [
+    {
+      "number": "1",
+      "name": "Repository Foundation & Build System",
+      "status": "pending"
+    },
+    {
+      "number": "2",
+      "name": "Core Rendering Pipeline",
+      "status": "pending"
+    },
+    {
+      "number": "3",
+      "name": "Character Asset System",
+      "status": "pending"
+    },
+    {
+      "number": "4",
+      "name": "Animation System",
+      "status": "pending"
+    },
+    {
+      "number": "5",
+      "name": "Audio / Lip Sync",
+      "status": "pending"
+    },
+    {
+      "number": "6",
+      "name": "Global Input Capture (Windows Raw Input)",
+      "status": "pending"
+    },
+    {
+      "number": "7",
+      "name": "Properties, Polish & Error Handling",
+      "status": "pending"
+    },
+    {
+      "number": "8",
+      "name": "Testing, Packaging & Release",
+      "status": "pending"
+    }
+  ],
+  "next": {
+    "command": "/gsd:progress --next",
+    "label": "Advance to the next step",
+    "reason": "Phase 01 of 8 · executing"
+  },
+  "updated_at": "2026-09-22T19:43:00.591Z"
+}

@@ -3,17 +3,17 @@ gsd_state_version: "1.0"
 milestone: v1.0
 current_phase: 01
 current_phase_name: Repository Foundation & Build System
-status: executing
-stopped_at: Completed 01-03-PLAN.md (data/characters/default/ placeholder pack + repo-root README.md)
-last_updated: "2026-09-23T14:24:10.316Z"
+status: verifying
+stopped_at: Completed 01-02-PLAN.md (vendored deps/, CI Windows-only conformance, first green Actions run on master)
+last_updated: "2026-09-23T14:47:31.707Z"
 last_activity: 2026-09-23
 last_activity_desc: Phase 01 execution started
-state_head: 5b27a08ac19cde7bd73e26761ae05666bc52d951
+state_head: 4062f1bc7371e47101e14b8e3d89141844f2dc56
 progress:
   total_phases: 8
   completed_phases: 0
   total_plans: 3
-  completed_plans: 2
+  completed_plans: 3
 ---
 
 # Project State
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-09-22)
 
 Phase: 01 (Repository Foundation & Build System) — EXECUTING
 Plan: 3 of 3
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-09-23 — Phase 01 execution started
 
 Progress: [░░░░░░░░░░] 0%
@@ -61,6 +61,7 @@ Progress: [░░░░░░░░░░] 0%
 |------|----------|-------|-------|
 | Phase 01 P01 | ~25min | 8 tasks | 5 files |
 | Phase 01 P03 | 5min | 2 tasks | 3 files |
+| Phase 01 P02 | 9 min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -76,6 +77,10 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 01]: Confirmed live: OBS 32.2.2 loads a plugin built against pinned OBS 31.1.1 headers (no Invalid module error) — RESEARCH.md Open Question 1 resolved, no buildspec re-pin needed
 - [Phase 01]: PIL not installed; generated placeholder PNG via stdlib zlib+struct instead of a PIL dependency
 - [Phase 01]: README.md documents the real verified per-plugin install layout (ProgramData) as primary, legacy Program Files layout as fallback
+- [Phase 01]: Pinned nlohmann/json to v3.11.3 (newest 3.11.x tag) and stb_image.h to unpinned upstream master (no tagged single-header releases); SHA256 hashes recorded in 01-02-SUMMARY.md
+- [Phase 01]: Disabled macos-build and ubuntu-build CI jobs via if: false + D-07 comment in build-project.yaml, keeping template structure intact for easy future re-enablement
+- [Phase 01]: Added deps/.clang-format (DisableFormat: true) to exempt vendored third-party headers from CI's clang-format changed-files check, discovered as a Rule 3 blocking deviation before it could break the first green CI run
+- [Phase 01]: Declined to self-modify git.allow_default_branch_commits in config.json after the harness's auto-mode classifier flagged it as self-modification of the executor's protected-branch guard; committed to master under the orchestrator's explicit sequential-executor authorization instead
 
 ### Pending Todos
 
@@ -88,6 +93,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-09-23T14:24:10.285Z
-Stopped at: Completed 01-03-PLAN.md (data/characters/default/ placeholder pack + repo-root README.md)
+Last session: 2026-09-23T14:47:31.675Z
+Stopped at: Completed 01-02-PLAN.md (vendored deps/, CI Windows-only conformance, first green Actions run on master)
 Resume file: None

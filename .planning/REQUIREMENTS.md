@@ -9,12 +9,12 @@
 
 ### OBS Integration
 
-- [ ] **OBS-01**: Plugin registers as a native OBS Source (`Sources → Add → Animated Avatar`) using `obs_source_info` with `OBS_SOURCE_TYPE_INPUT | OBS_SOURCE_VIDEO | OBS_SOURCE_CUSTOM_DRAW`
+- [x] **OBS-01**: Plugin registers as a native OBS Source (`Sources → Add → Animated Avatar`) using `obs_source_info` with `OBS_SOURCE_TYPE_INPUT | OBS_SOURCE_VIDEO | OBS_SOURCE_CUSTOM_DRAW`
 - [ ] **OBS-02**: Source supports full OBS lifecycle: `create`, `destroy`, `update`, `get_width`, `get_height`, `video_render`, `video_tick`, `show`, `hide`
 - [ ] **OBS-03**: Source settings and all user configuration persists across OBS restarts via `obs_data_t` serialization
 - [ ] **OBS-04**: Source can be duplicated within a scene and used in multiple scenes simultaneously
 - [ ] **OBS-05**: Source exposes a properties panel (`obs_properties_t`) with all user-facing configuration options
-- [ ] **OBS-06**: Plugin loads and unloads cleanly via `obs_module_load` / `obs_module_unload` without crashing OBS on repeated load/unload cycles
+- [x] **OBS-06**: Plugin loads and unloads cleanly via `obs_module_load` / `obs_module_unload` without crashing OBS on repeated load/unload cycles
 - [ ] **OBS-07**: All GPU resource creation and destruction occurs inside `obs_enter_graphics()` / `obs_leave_graphics()` guards (or inside `video_render`) to prevent graphics context crashes
 
 ### Rendering
@@ -95,10 +95,10 @@
 
 ### Platform / Build
 
-- [ ] **BUILD-01**: Plugin builds on Windows with VS 2022, CMake 3.24+, C++20, using `obs-plugintemplate` scaffold and `buildspec.json` for OBS dev package pinning
-- [ ] **BUILD-02**: `cmake --preset windows-x64` produces a `.dll` that OBS 30.0+ can load without additional dependencies
-- [ ] **BUILD-03**: Platform-specific code (Raw Input, Win32 HWND) is isolated behind a `platform/` abstraction interface; engine core has no `#include <windows.h>` calls
-- [ ] **BUILD-04**: Debug and Release configurations supported; no CRT mismatch (`/MD` both configs)
+- [x] **BUILD-01**: Plugin builds on Windows with VS 2022, CMake 3.24+, C++20, using `obs-plugintemplate` scaffold and `buildspec.json` for OBS dev package pinning
+- [x] **BUILD-02**: `cmake --preset windows-x64` produces a `.dll` that OBS 30.0+ can load without additional dependencies
+- [x] **BUILD-03**: Platform-specific code (Raw Input, Win32 HWND) is isolated behind a `platform/` abstraction interface; engine core has no `#include <windows.h>` calls
+- [x] **BUILD-04**: Debug and Release configurations supported; no CRT mismatch (`/MD` both configs)
 - [ ] **BUILD-05**: Build produces versioned ZIP artifact: `AnimatedAvatarPlugin-{version}-windows.zip` containing the `.dll` and a `characters/default/` pack
 
 ### Testing
@@ -183,6 +183,7 @@
 | TEST-01 – TEST-03 | Phase 8 | Pending |
 
 **Coverage:**
+
 - v1 requirements: 55 total
 - Mapped to phases: 55
 - Unmapped: 0 ✓

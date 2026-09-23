@@ -254,6 +254,7 @@ obs-avatar/
 **Decision:** Implementation language for the plugin.
 
 **Alternatives Considered:**
+
 - Rust with `cc` crate and C FFI bindings to libobs
 - C++ with C++20 features (concepts, ranges, coroutines where applicable)
 - C (no RAII, no templates)
@@ -271,6 +272,7 @@ obs-avatar/
 **Decision:** How the avatar is delivered to OBS.
 
 **Alternatives Considered:**
+
 - Separate application that creates a window captured via OBS "Window Capture" source
 - Browser source (Electron/web renderer)
 - Virtual camera feeding an OBS camera source
@@ -289,6 +291,7 @@ obs-avatar/
 **Decision:** Which GPU API to use for rendering the avatar layers.
 
 **Alternatives Considered:**
+
 - Direct3D 11 via `<d3d11.h>` with a separate render context
 - OpenGL via GLFW in a separate context
 - Skia 2D graphics library
@@ -307,6 +310,7 @@ obs-avatar/
 **Decision:** Animation rendering approach for the character.
 
 **Alternatives Considered:**
+
 - Sprite sheet: single large texture atlas with frame rectangles; swap UV coords per frame
 - Skeletal animation: Spine runtime, bone hierarchy, mesh deformation
 - Layered 2D: independent PNG textures per body part, positioned and transformed independently
@@ -324,6 +328,7 @@ obs-avatar/
 **Decision:** How multiple animation sources (idle, audio, mouse, keyboard) blend onto shared parameters.
 
 **Alternatives Considered:**
+
 - Additive blending: all tracks add their deltas to a shared parameter
 - Layered blending with masks: explicit bitmask of which parameters each track owns
 - Priority override: reset to defaults, write lowest-to-highest priority, higher wins per channel
@@ -342,6 +347,7 @@ obs-avatar/
 **Decision:** How to capture global keyboard events.
 
 **Alternatives Considered:**
+
 - `WH_KEYBOARD_LL` low-level keyboard hook: `SetWindowsHookEx(WH_KEYBOARD_LL, ...)`
 - `WH_KEYBOARD` thread-local hook (does not cover other applications' windows)
 - Direct input polling (`GetKeyState` in a tight loop)
@@ -360,6 +366,7 @@ obs-avatar/
 **Decision:** How to capture global mouse movement and click events.
 
 **Alternatives Considered:**
+
 - `SetWindowsHookEx(WH_MOUSE_LL, ...)` low-level mouse hook
 - `GetCursorPos` polling (absolute position, privacy concern)
 - Windows Raw Input (same infrastructure as keyboard)
@@ -377,6 +384,7 @@ obs-avatar/
 **Decision:** How to access microphone audio data for lip sync.
 
 **Alternatives Considered:**
+
 - Windows WASAPI directly: `IAudioCaptureClient`, separate audio device enumeration
 - OBS output audio (post-mix): taps the OBS master mix rather than a specific source
 - `obs_source_add_audio_capture_callback` on a user-selected OBS audio source
@@ -394,6 +402,7 @@ obs-avatar/
 **Decision:** File format for `character.json` and animation clip definitions.
 
 **Alternatives Considered:**
+
 - TOML: human-friendly, no single-header C++ parser with comparable maturity to nlohmann/json
 - Binary (custom or MessagePack): compact, fast parse; difficult to hand-author and inspect
 - XML: verbose; no good vendorable single-header C++ parser
@@ -412,6 +421,7 @@ obs-avatar/
 **Decision:** How to share state across OBS render thread, OBS audio thread, and the plugin's input thread.
 
 **Alternatives Considered:**
+
 - Global mutex protecting all shared state: simple but blocks render thread on lock contention
 - Message passing with a `std::queue` protected by `std::mutex`
 - Lock-free structures throughout: complex but zero contention
@@ -430,6 +440,7 @@ obs-avatar/
 **Decision:** Library for loading PNG textures.
 
 **Alternatives Considered:**
+
 - libpng: mature, streaming decode, complex API, CMake integration required, not header-only
 - Windows Imaging Component (WIC): Windows-only, COM-based, verbose boilerplate
 - stb_image: public domain single-header library; supports PNG, JPEG, BMP; simple API
@@ -447,6 +458,7 @@ obs-avatar/
 **Decision:** How to isolate Win32-specific code from the engine core.
 
 **Alternatives Considered:**
+
 - Preprocessor guards (`#ifdef _WIN32`) throughout engine source files
 - Separate compilation units conditionally included via CMake
 - Abstract interface (`InputCapture`) with platform-specific implementations in `platform/win32/`
@@ -497,6 +509,7 @@ obs-avatar/
 Unit tests use GoogleTest (or Catch2) compiled separately from the plugin DLL. They link against `engine/` and `render/` but not `obs-integration/` (no OBS dependency in unit tests). Each test file corresponds to one module.
 
 **`test_easing.cpp` — `Easing.h`**
+
 - Linear interpolation: `lerp(0, 1, 0.5)` → 0.5; boundary values u=0 → 0, u=1 → 1
 - Ease-in cubic: verify curve is slower at start, faster at end
 - Ease-out cubic: verify curve is faster at start, slower at end
@@ -505,6 +518,7 @@ Unit tests use GoogleTest (or Catch2) compiled separately from the plugin DLL. T
 - Out-of-range u: u < 0 clamped to start; u > 1 clamped to end
 
 **`test_animation_clip.cpp` — `AnimationClip.h`**
+
 - Single-keyframe clip: evaluate at any t → constant value
 - Two-keyframe linear clip: midpoint interpolation
 - Multi-keyframe sparse: evaluate at keyframe times exactly; evaluate between keyframes
@@ -513,12 +527,14 @@ Unit tests use GoogleTest (or Catch2) compiled separately from the plugin DLL. T
 - One-shot completion flag: `isComplete()` returns true after clip duration elapsed
 
 **`test_parameter_store.cpp` — `AnimationSystem.h` / `ParameterStore.h`**
+
 - Default reset: after `tick()`, all params reset to defaults before track writes
 - Priority ordering: Keyboard track (priority 3) write of `arm_right.rotation = 90` survives when Idle track (priority 0) writes `arm_right.rotation = 0` first in same tick
 - Audio track owns `mouth_open` exclusively when active; Idle track does not override it
 - Multi-parameter frame: verify 5 different param channels all hold correct values after one tick with 3 active tracks
 
 **`test_rms.cpp` — `AudioBridge` logic (extracted pure function)**
+
 - Zero-signal RMS: all-zero buffer → RMS = 0
 - Full-scale RMS: buffer of 1.0 samples → RMS = 1.0
 - Mixed: verify `sqrt(sum/n)` formula against hand-calculated value
@@ -528,6 +544,7 @@ Unit tests use GoogleTest (or Catch2) compiled separately from the plugin DLL. T
 - Sensitivity multiplier: 2x sensitivity doubles pre-threshold RMS
 
 **`test_character_parser.cpp` — `CharacterDefinition.h`**
+
 - Valid minimal JSON: 1 layer, version 1, no animation refs → loads successfully
 - Valid full JSON: all fields present → all fields populated correctly
 - Missing `version` field → `LOG_ERROR`; returns `std::nullopt`
@@ -542,6 +559,7 @@ Unit tests use GoogleTest (or Catch2) compiled separately from the plugin DLL. T
 **`test_integration_load.cpp` — Plugin DLL lifecycle (requires OBS test harness)**
 
 OBS provides a minimal test harness (`obs_init` / `obs_shutdown` in test mode). This test:
+
 1. Calls `obs_module_load()`; verifies return `true`
 2. Creates an avatar source via `obs_source_create("animated_avatar_source", ...)`
 3. Calls `obs_source_get_width` / `obs_source_get_height`; verifies non-zero
@@ -553,6 +571,7 @@ OBS provides a minimal test harness (`obs_init` / `obs_shutdown` in test mode). 
 ### Manual Test Checklist
 
 **Keyboard Reactions:**
+
 - [ ] Open OBS with plugin installed. Add Animated Avatar source.
 - [ ] Type text in any application window. Observe arm/hand animation activates.
 - [ ] Stop typing for > 500ms. Observe arm/hand returns to neutral.
@@ -561,6 +580,7 @@ OBS provides a minimal test harness (`obs_init` / `obs_shutdown` in test mode). 
 - [ ] Re-enable keyboard reactions. Verify animation resumes.
 
 **Mouse Reactions:**
+
 - [ ] Move mouse rapidly. Observe hand follows movement direction.
 - [ ] Stop mouse. Observe hand returns smoothly to neutral.
 - [ ] Left-click. Observe click animation on hand.
@@ -569,6 +589,7 @@ OBS provides a minimal test harness (`obs_init` / `obs_shutdown` in test mode). 
 - [ ] Disable mouse reactions. Verify hand does not move with mouse.
 
 **Audio / Lip Sync:**
+
 - [ ] Select microphone as audio source in properties.
 - [ ] Speak at normal volume. Observe mouth opens.
 - [ ] Speak loudly. Observe mouth transitions through small→open→wide.
@@ -578,6 +599,7 @@ OBS provides a minimal test harness (`obs_init` / `obs_shutdown` in test mode). 
 - [ ] Background noise only (typing, fan). Verify silence threshold keeps mouth closed.
 
 **OBS Lifecycle:**
+
 - [ ] Add source. OBS restart. Verify source persists with all settings.
 - [ ] Duplicate source in same scene. Verify both instances animate independently.
 - [ ] Add source to second scene. Switch scenes. Verify animation continues correctly.
@@ -669,6 +691,7 @@ matrix:
 ```
 
 CI steps:
+
 1. Checkout with submodules
 2. Run CMake configure (`--preset windows-x64`)
 3. Build Debug → run unit tests (`ctest --preset windows-x64`)
@@ -681,34 +704,40 @@ CI steps:
 ## Future Roadmap (Post-MVP)
 
 ### Characters
+
 - **v2**: Visual character pack browser with thumbnail preview in OBS properties
 - **v2**: Built-in character editor (position/scale layer pivots, define animation channels)
 - **v2**: Keyframe animation editor (visual timeline, easing curve editor)
 - **v3**: Character pack marketplace with download UI inside OBS
 
 ### Input
+
 - **v2**: Per-key hand mapping (WASD → left hand, arrow keys → right hand) via JSON config
 - **v2**: Gamepad/controller button and axis reaction animations
 - **v2**: OBS event reactions (scene switch animation, recording-start fist-pump)
 - **v3**: Configurable key-to-animation macro system
 
 ### Animation
+
 - **v2**: Smooth cross-fade blending between animation tracks (replace instant-snap with lerp)
 - **v2**: Expression/emotion system: happy, surprised, focused, sleepy states
 - **v2**: Simulated eye tracking: eyes follow mouse cursor position (approximated from delta)
 - **v3**: Webcam-driven face tracking for head pose (via MediaPipe or similar)
 
 ### Audio
+
 - **v2**: Multiple audio source blending for lip sync (blend two mics)
 - **v3**: Phoneme-approximate lip sync: basic formant analysis for vowel shape mapping
 - **v3**: External speech recognition integration (Whisper) for emoji/expression triggers
 
 ### Platform
+
 - **v2**: Linux support (evdev or X11 input, PulseAudio/JACK audio callback)
 - **v2**: macOS support (CGEventTap input, CoreAudio callback)
 - **v2**: Unified CMake platform abstraction layer
 
 ### Distribution
+
 - **v2**: Windows NSIS/WiX installer with OBS auto-detection
 - **v2**: OBS Plugin Browser listing (metadata, screenshots, version history)
 - **v3**: Auto-update mechanism
@@ -759,6 +788,7 @@ CI steps:
 **Prerequisites**: VS 2022 installed with C++ Desktop workload; CMake 3.24+ on PATH; Git; access to GitHub for `obs-plugintemplate` clone.
 
 **Detailed Task List**:
+
 - 1.1: Clone `obsproject/obs-plugintemplate` (HEAD); read `README.md` and `buildspec.json`
 - 1.2: Identify current OBS stable version; update `buildspec.json` to pin it
 - 1.3: Run `cmake --preset windows-x64`; verify configure succeeds; note any CMake warnings
@@ -773,6 +803,7 @@ CI steps:
 - 1.12: Document OBS version and `obs-plugintemplate` commit SHA in `README.md`
 
 **Files/Modules Created or Modified**:
+
 - `CMakeLists.txt` (rename, add deps include, add src files)
 - `buildspec.json` (OBS version pin)
 - `CMakePresets.json` (verify presets; may need minor update)
@@ -784,19 +815,23 @@ CI steps:
 - `README.md` (initial)
 
 **Technical Decisions Required**:
+
 - Confirm OBS minimum version (30.x vs 31.x) — pin in `buildspec.json`
 - Confirm `find_package(libobs REQUIRED)` vs `find_package(OBS REQUIRED)` in current template
 - Decide plugin DLL filename: `obs-avatar.dll`
 
 **Dependencies**:
+
 - External: `obsproject/obs-plugintemplate` (GitHub), OBS Studio dev package (downloaded by CMake)
 - Internal: None (this is phase 1)
 
 **Risks**:
+
 - `obs-plugintemplate` HEAD may have changed since research; CMake preset names may differ — mitigated by reading template README first
 - OBS dev package download URL in `buildspec.json` may have changed — resolved by checking template issues/README
 
 **Validation Criteria (observable)**:
+
 1. `cmake --preset windows-x64` exits with code 0 and no errors
 2. `cmake --build` produces `obs-avatar.dll`
 3. OBS launches with plugin loaded; `[obs-avatar]` prefix appears in OBS log
@@ -806,8 +841,9 @@ CI steps:
 
 **Definition of Done**: OBS loads the plugin, a solid-color source appears and can be added/deleted cleanly, CI is green, and a minimum-viable README documents the build process.
 
-**Plans:** 3 plans
-- [ ] 01-01-PLAN.md — End-to-end tracer: rename to obs-animated-avatar, register animated_avatar_source, purple 320x240 placeholder, OBS load test (tasks 1.1-1.9)
+**Plans:** 1/3 plans executed
+
+- [x] 01-01-PLAN.md — End-to-end tracer: rename to obs-animated-avatar, register animated_avatar_source, purple 320x240 placeholder, OBS load test (tasks 1.1-1.9)
 - [ ] 01-02-PLAN.md — Build expansion: vendor nlohmann/json + stb_image, verify template CI green on Windows x64 only (tasks 1.10 + 1.11)
 - [ ] 01-03-PLAN.md — Documentation + assets expansion: D-09 placeholder character pack, initial README (task 1.12 + D-09 scaffold)
 
@@ -822,6 +858,7 @@ CI steps:
 **Prerequisites**: Phase 1 complete (compilable, loadable plugin skeleton).
 
 **Detailed Task List**:
+
 - 2.1: Verify `gs_texture_create` exact signature against current OBS `graphics/graphics.h`
 - 2.2: Create `src/render/TextureCache.h/.cpp`: `loadTexture(path) → gs_texture_t*`; load PNG via `stb_image`; convert straight-alpha to premultiplied (per-pixel: `r *= a/255`, etc.); call `gs_texture_create` inside graphics lock; cache by absolute path; destroy on `clear()` inside graphics lock
 - 2.3: Create `src/render/RenderCompositor.h/.cpp`: takes a list of `LayerDrawCmd{gs_texture_t*, float x, y, rot, sx, sy, opacity}`; implements FBO setup and per-layer draw loop
@@ -835,25 +872,30 @@ CI steps:
 - 2.11: Implement `show()` / `hide()` callbacks (stub for now; mark FBO active/inactive)
 
 **Files/Modules Created or Modified**:
+
 - `src/render/TextureCache.h/.cpp` (new)
 - `src/render/RenderCompositor.h/.cpp` (new)
 - `src/obs-integration/AvatarSource.h/.cpp` (expand: add video_render, video_tick, get_width, get_height)
 - Test PNG assets in `tests/assets/` (colored rectangles for render testing)
 
 **Technical Decisions Required**:
+
 - Confirm `gs_texture_create` signature (see Open Question 3)
 - Confirm premultiplied alpha conversion formula (CPU-side uint8 multiply before `gs_texture_create`)
 - Decide source default dimensions (512×512 or 320×240)
 
 **Dependencies**:
+
 - Internal: Phase 1 (plugin skeleton, build system)
 - External: `stb_image.h` (vendored), libobs `graphics/graphics.h`
 
 **Risks**:
+
 - RISK-01: `gs_*` outside graphics context — mitigated by calling `obs_enter_graphics()` in `TextureCache::loadTexture()` and `TextureCache::clear()`; only `video_render` calls compositor
 - RISK-07: GPU resource leak on reload — mitigated by test 2.10 (VRAM check after delete cycles)
 
 **Validation Criteria (observable)**:
+
 1. OBS source renders 3 test texture layers in back-to-front order with correct alpha transparency
 2. Top layer partially transparent shows layer below it correctly composited
 3. Source dimensions are correct (matches configured width/height)
@@ -873,6 +915,7 @@ CI steps:
 **Prerequisites**: Phase 2 complete (render pipeline with FBO compositing and texture loading).
 
 **Detailed Task List**:
+
 - 3.1: Design `character.json` schema: `version` (int), `name` (string), `layers` (array of `{id, texture, pivot_x, pivot_y, default_x, default_y, default_rotation, default_scale_x, default_scale_y, param_channels: {x, y, rotation, scale_x, scale_y, opacity}}`)
 - 3.2: Create `src/engine/CharacterDefinition.h/.cpp`: `CharacterDefinition::parse(path) → std::optional<CharacterDefinition>`; uses nlohmann/json; reads version field first; validates required fields; produces detailed `LOG_ERROR` on failure; returns `std::nullopt` on any error
 - 3.3: Implement `CHAR-07`: reject unsupported version with clear error message
@@ -890,6 +933,7 @@ CI steps:
 - 3.15: Test: point to corrupt `character.json`; verify error in OBS log, blank source, no crash
 
 **Files/Modules Created or Modified**:
+
 - `src/engine/CharacterDefinition.h/.cpp` (new)
 - `src/engine/CharacterDiscovery.h/.cpp` (new)
 - `src/obs-integration/PropertiesPanel.h/.cpp` (new — basic character dropdown)
@@ -898,20 +942,24 @@ CI steps:
 - `characters/default/textures/*.png` (new — placeholders)
 
 **Technical Decisions Required**:
+
 - Finalize `character.json` schema version number (start at 1)
 - Decide mouth animation model: discrete texture swap vs UV-parameterized (Open Question 4) — must decide before this phase to include correct layer naming in default character
 - Decide `characters/` directory location: relative to OBS data directory or configurable absolute path
 
 **Dependencies**:
+
 - Internal: Phase 2 (render pipeline, texture loading)
 - External: nlohmann/json (vendored), C++20 `<filesystem>`
 
 **Risks**:
+
 - RISK-10: Character format version incompatibility — mitigated by `version` field check first in parser
 - RISK-07: GPU resource leak on hot-reload — mitigated by graphics-lock texture release in `update()`
 - Mouth model decision (Open Question 4) must be resolved before authoring `character.json` schema; delaying blocks Phase 4 parameter channel naming
 
 **Validation Criteria (observable)**:
+
 1. Default character renders all layers in OBS from `character.json` definition
 2. Changing character selection in OBS properties hot-reloads the new character within one frame
 3. Deleting a texture file and reloading produces a `LOG_WARNING` and renders that layer transparent (no crash)
@@ -931,6 +979,7 @@ CI steps:
 **Prerequisites**: Phase 3 complete (character definition loaded, layer parameter channels named).
 
 **Detailed Task List**:
+
 - 4.1: Create `src/engine/Easing.h`: constexpr functions for `linear`, `easeIn`, `easeOut`, `easeInOut`, `hold`; all take `float u` (0–1) and return `float`
 - 4.2: Create `src/engine/AnimationClip.h/.cpp`: `struct Keyframe{float time; float value; EasingType easing;}`; `AnimationClip{string channel; vector<Keyframe> keyframes; bool loop;}`; `evaluate(float t) → float`; binary search over keyframes; applies easing between bracket pair; handles loop (fmod) and one-shot (clamp + `complete_` flag)
 - 4.3: Create `src/engine/ParameterStore.h/.cpp`: `unordered_map<string, float> values_`; `unordered_map<string, float> defaults_`; `set(channel, value)`, `get(channel) → float`, `resetToDefaults()`, `registerDefault(channel, float)`
@@ -946,6 +995,7 @@ CI steps:
 - 4.13: Test: observe random blink at configurable interval
 
 **Files/Modules Created or Modified**:
+
 - `src/engine/Easing.h` (new)
 - `src/engine/AnimationClip.h/.cpp` (new)
 - `src/engine/ParameterStore.h/.cpp` (new)
@@ -955,19 +1005,23 @@ CI steps:
 - `src/render/RenderCompositor.h/.cpp` (expand: read ParameterStore for per-layer transforms)
 
 **Technical Decisions Required**:
+
 - Idle animation authoring: hardcoded clip data in C++ vs small JSON animation definition file
 - Random blink: use `std::mt19937` seeded from `std::random_device` for per-instance variation
 - Animation clip channel naming convention: `{layer_id}.rotation` vs `{layer_id}_rotation`
 
 **Dependencies**:
+
 - Internal: Phase 3 (character definition, layer parameter channel names, ParameterStore defaults)
 - External: C++20 stdlib only (`<random>`, `<algorithm>`, `<vector>`, `<unordered_map>`)
 
 **Risks**:
+
 - Incorrect easing function implementations produce subtle animation artifacts; mitigated by unit tests (Phase 8 formalizes; basic sanity tests should be written now in `tests/`)
 - Animation clip binary search edge case at exact keyframe time boundaries — test boundary values in unit tests
 
 **Validation Criteria (observable)**:
+
 1. Character layers visibly animate in idle mode: body breathes (vertical oscillation), head has subtle sway
 2. Blink animation fires approximately every 3–6 seconds with correct layering on the eye layer
 3. Idle animation continues running on non-conflicting channels when a higher-priority clip is manually triggered (test by temporarily hardcoding a keyboard track clip)
@@ -987,6 +1041,7 @@ CI steps:
 **Prerequisites**: Phase 4 complete (AnimationSystem with Audio track at priority 1, ParameterStore with `mouth_open` parameter).
 
 **Detailed Task List**:
+
 - 5.1: Create `src/obs-integration/AudioBridge.h/.cpp`: owns `obs_source_t* audioSource_` (weak reference, not addref); `std::atomic<float> rmsAmplitude_`; `float smoothedRms_`, `attackCoeff_`, `releaseCoeff_`, `silenceThreshold_`, `sensitivity_`
 - 5.2: Implement `AudioBridge::setSource(obs_source_t*)`: remove callback from old source; add callback to new source; store weak pointer
 - 5.3: Implement static `AudioBridge::audioCallback(void* param, obs_source_t*, const audio_data* data, bool muted)`: compute RMS over `data->data[0]` frames (32-bit float); apply silence threshold; apply sensitivity; write to `rmsAmplitude_.store(rms, memory_order_relaxed)`; no mutex, no alloc, no OBS API calls
@@ -1001,6 +1056,7 @@ CI steps:
 - 5.12: Test: remove selected audio source from OBS sources list; verify no crash (`AUDIO-07`)
 
 **Files/Modules Created or Modified**:
+
 - `src/obs-integration/AudioBridge.h/.cpp` (new)
 - `src/obs-integration/PropertiesPanel.h/.cpp` (expand: audio source dropdown, lip-sync sliders)
 - `src/obs-integration/AvatarSource.h/.cpp` (expand: wire AudioBridge)
@@ -1009,19 +1065,23 @@ CI steps:
 - `characters/default/character.json` (add mouth layer with state-keyed texture paths)
 
 **Technical Decisions Required**:
+
 - Confirm `audio_data` struct field access pattern against current libobs `media-io/audio-io.h`
 - Attack/release coefficient calculation: `coeff = 1 - exp(-delta / time_constant)` vs simpler linear approximation; exponential is perceptually more natural
 - Mouth layer rendering: separate texture per state (discrete swap) vs single texture with UV offset — confirm Open Question 4 resolved before this phase
 
 **Dependencies**:
+
 - Internal: Phase 4 (AnimationSystem Audio track, ParameterStore `mouth_open` channel)
 - External: libobs `obs-source.h`, `media-io/audio-io.h`
 
 **Risks**:
+
 - RISK-02: Mutex on audio thread — `AudioBridge::audioCallback` must never lock; enforced by architecture (only `std::atomic` write in callback path)
 - Source lifetime: `obs_source_t*` pointer from audio source dropdown may become stale if user deletes the source; mitigated by `source_remove` signal handler
 
 **Validation Criteria (observable)**:
+
 1. User can select a microphone from the OBS properties dropdown
 2. Mouth opens visibly when the user speaks into the microphone
 3. Mouth closes within the configured release time after silence
@@ -1042,6 +1102,7 @@ CI steps:
 **Prerequisites**: Phase 5 complete. Run Raw Input proof-of-concept spike before writing production code (per research recommendation): minimal Win32 app confirming `RIDEV_INPUTSINK` delivers background events.
 
 **Detailed Task List**:
+
 - 6.1: (Spike) Write `tests/spike_rawinput.cpp`: standalone Win32 console app; registers `RIDEV_INPUTSINK` on a message-only window; runs GetMessage loop; confirms events arrive when another window is focused; confirms VKey is present and discardable; run, verify, delete spike
 - 6.2: Create `src/platform/InputCapture.h`: abstract interface `class IInputCapture { virtual void start(InputEventCallback) = 0; virtual void stop() = 0; virtual ~IInputCapture() = default; }`; define `InputEvent{enum EventType {KEY_DOWN, KEY_UP, MOUSE_MOVE, MOUSE_CLICK}; int16_t dx; int16_t dy; MouseButton button;}`
 - 6.3: Create `src/platform/win32/SpscQueue.h`: header-only fixed-capacity SPSC ring buffer; template on element type and capacity; `push(T) → bool` (returns false if full); `pop() → std::optional<T>`; lock-free using `std::atomic<size_t>` head/tail
@@ -1062,6 +1123,7 @@ CI steps:
 - 6.18: Test: reload plugin (disable/re-enable in OBS settings); verify no access violation on second load
 
 **Files/Modules Created or Modified**:
+
 - `src/platform/InputCapture.h` (new — interface)
 - `src/platform/win32/SpscQueue.h` (new)
 - `src/platform/win32/Win32InputCapture.h/.cpp` (new)
@@ -1071,20 +1133,24 @@ CI steps:
 - `CMakeLists.txt` (add platform/win32 sources conditionally on WIN32)
 
 **Technical Decisions Required**:
+
 - Startup barrier implementation: `std::promise`/`std::future` or manual `std::atomic<bool>` spin
 - SPSC queue capacity: 256 events (human HCI rate at 60fps renders ~16 events/frame max in sustained typing)
 - Mouse delta scaling factor: start at 0.5px per raw count; tune in testing
 
 **Dependencies**:
+
 - Internal: Phase 4 (AnimationSystem Keyboard/Mouse tracks, ParameterStore)
 - External: Win32 API (`<windows.h>`, `<hidusage.h>`); C++20 `<thread>`, `<atomic>`
 
 **Risks**:
+
 - RISK-03: Raw Input unregistration crash — mitigated by `stop()` posting WM_QUIT and joining thread before RIDEV_REMOVE; test 6.18 validates
 - RISK-06: Privacy violation (VKey logged) — mitigated by strict discard in `handleRawInput()`; Phase 6 code review checklist
 - RISK-04: Anti-cheat software interference — documented limitation; not a plugin bug; mitigated by enable/disable toggle
 
 **Validation Criteria (observable)**:
+
 1. Typing in any application (including OBS itself) activates arm animation in OBS source preview
 2. Typing animation persists while typing; stops after 500ms cooldown of no key presses
 3. Mouse movement drives hand offset animation; hand returns to neutral when mouse is still
@@ -1107,6 +1173,7 @@ CI steps:
 **Prerequisites**: Phases 1–6 complete (all subsystems functional).
 
 **Detailed Task List**:
+
 - 7.1: Complete `PropertiesPanel`: implement all CFG-01 through CFG-07 properties
   - Character dropdown (CHAR-03 discovery, hot-reload)
   - Source width/height integer inputs
@@ -1142,6 +1209,7 @@ CI steps:
 - 7.13: Test: debug mode on; verify per-frame log output appears in OBS log
 
 **Files/Modules Created or Modified**:
+
 - `src/obs-integration/PropertiesPanel.h/.cpp` (major expansion: all CFG-01–07)
 - `src/obs-integration/AvatarSource.h/.cpp` (expand: get_defaults, copy callback, duplication support)
 - `src/plugin-support.h` (expand: log category macros, debug mode helpers)
@@ -1149,18 +1217,22 @@ CI steps:
 - All subsystem files (audit and add missing LOG_* calls)
 
 **Technical Decisions Required**:
+
 - Property group/collapse UI: OBS supports `obs_property_group_type` (collapsible sections); decide which settings to group and whether to use groups
 - `copy` callback implementation: whether to reload textures from disk or share the `TextureCache` instance (separate caches are simpler and avoid shared-ownership complexity)
 
 **Dependencies**:
+
 - Internal: All prior phases (every system gets logging hardened)
 - External: libobs properties API, locale system
 
 **Risks**:
+
 - `update()` non-idempotency causing texture leaks — mitigated by task 7.7 audit
 - Missing `get_defaults` causing first-time use crashes — mitigated by task 7.10 test
 
 **Validation Criteria (observable)**:
+
 1. First-time source add shows all default values in properties (no blank/zero fields)
 2. All settings persist correctly across OBS restart
 3. Duplicate source creates an independent instance that animates separately
@@ -1181,6 +1253,7 @@ CI steps:
 **Prerequisites**: Phase 7 complete (all systems functional and polished).
 
 **Detailed Task List**:
+
 - 8.1: Add GoogleTest (or Catch2) to `tests/CMakeLists.txt`; add `enable_testing()` and `add_test()` in top-level CMake; wire `NullInputCapture` for test builds (no Win32 dependency)
 - 8.2: Write `tests/test_easing.cpp` (all 5 modes, boundary values — per Testing Strategy)
 - 8.3: Write `tests/test_animation_clip.cpp` (evaluation, loop, one-shot, binary search edge cases)
@@ -1198,6 +1271,7 @@ CI steps:
 - 8.15: Fix all blockers found during manual testing
 
 **Files/Modules Created or Modified**:
+
 - `tests/CMakeLists.txt` (new)
 - `tests/test_easing.cpp` (new)
 - `tests/test_animation_clip.cpp` (new)
@@ -1211,18 +1285,22 @@ CI steps:
 - `README.md` (complete)
 
 **Technical Decisions Required**:
+
 - Test framework: GoogleTest (easier CI integration via FetchContent) vs Catch2 (header-only, no build step) — recommend GoogleTest for CMake integration
 - OBS integration test harness: whether to use `obs_init` in test mode or write a minimal mock; if OBS test harness is too complex to set up in CI, stub the integration test and document as manual-only
 
 **Dependencies**:
+
 - Internal: All prior phases (tests exercise all modules)
 - External: GoogleTest (FetchContent in CMake), CMake `ctest`
 
 **Risks**:
+
 - Integration test requiring OBS in CI is complex; mitigated by stubbing if CI OBS setup is impractical
 - Manual test checklist failures requiring Phase 7 fixes — budget time for at least one round-trip
 
 **Validation Criteria (observable)**:
+
 1. `ctest` on the CI matrix reports 0 failures across all unit tests
 2. GitHub Actions CI passes on every commit to main branch
 3. Release ZIP artifact is produced on tag push and named correctly (`AnimatedAvatarPlugin-1.0.0-alpha.1-windows.zip`)
@@ -1240,7 +1318,7 @@ CI steps:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Repository Foundation & Build System | 0/3 | Planned | - |
+| 1. Repository Foundation & Build System | 1/3 | In Progress|  |
 | 2. Core Rendering Pipeline | 0/3 | Not started | - |
 | 3. Character Asset System | 0/3 | Not started | - |
 | 4. Animation System | 0/3 | Not started | - |

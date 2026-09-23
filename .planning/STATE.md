@@ -4,16 +4,16 @@ milestone: v1.0
 current_phase: 01
 current_phase_name: Repository Foundation & Build System
 status: executing
-stopped_at: "Completed 01-01-PLAN.md (tracer slice: OBS loads obs-animated-avatar.dll, renders purple placeholder, animated_avatar_source id locked)"
-last_updated: "2026-09-23T14:17:46.879Z"
+stopped_at: Completed 01-03-PLAN.md (data/characters/default/ placeholder pack + repo-root README.md)
+last_updated: "2026-09-23T14:24:10.316Z"
 last_activity: 2026-09-23
 last_activity_desc: Phase 01 execution started
-state_head: 467131c48a79ff7bf8a90d8139577abbad3603f0
+state_head: 5b27a08ac19cde7bd73e26761ae05666bc52d951
 progress:
   total_phases: 8
   completed_phases: 0
   total_plans: 3
-  completed_plans: 1
+  completed_plans: 2
 ---
 
 # Project State
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-09-22)
 ## Current Position
 
 Phase: 01 (Repository Foundation & Build System) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-09-23 — Phase 01 execution started
 
@@ -60,6 +60,7 @@ Progress: [░░░░░░░░░░] 0%
 | Plan | Duration | Tasks | Files |
 |------|----------|-------|-------|
 | Phase 01 P01 | ~25min | 8 tasks | 5 files |
+| Phase 01 P03 | 5min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -73,6 +74,8 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Roadmap]: SPSC ring buffer for input→render; std::atomic<float> for audio→render
 - [Phase 01]: Confirmed OBS source type ID 'animated_avatar_source' as permanent, one-way-door identifier — One-way door per D-01, locked before implementation of avatar-source.cpp. User explicitly confirmed via checkpoint 01-01-01.
 - [Phase 01]: Confirmed live: OBS 32.2.2 loads a plugin built against pinned OBS 31.1.1 headers (no Invalid module error) — RESEARCH.md Open Question 1 resolved, no buildspec re-pin needed
+- [Phase 01]: PIL not installed; generated placeholder PNG via stdlib zlib+struct instead of a PIL dependency
+- [Phase 01]: README.md documents the real verified per-plugin install layout (ProgramData) as primary, legacy Program Files layout as fallback
 
 ### Pending Todos
 
@@ -85,6 +88,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-09-23T14:17:46.850Z
-Stopped at: Completed 01-01-PLAN.md (tracer slice: OBS loads obs-animated-avatar.dll, renders purple placeholder, animated_avatar_source id locked)
+Last session: 2026-09-23T14:24:10.285Z
+Stopped at: Completed 01-03-PLAN.md (data/characters/default/ placeholder pack + repo-root README.md)
 Resume file: None

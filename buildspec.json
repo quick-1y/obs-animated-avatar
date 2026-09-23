@@ -33,13 +33,13 @@
     },
     "platformConfig": {
         "macos": {
-            "bundleId": "com.example.plugintemplate-for-obs"
+            "bundleId": "com.example.obs-animated-avatar"
         }
     },
-    "name": "plugintemplate-for-obs",
-    "displayName": "Plugin Template for OBS",
-    "version": "1.0.0",
-    "author": "Your Name Here",
-    "website": "https://example.com",
-    "email": "me@example.com"
+    "name": "obs-animated-avatar",
+    "displayName": "Animated Avatar Plugin for OBS",
+    "version": "0.1.0",
+    "author": "quick-1y",
+    "website": "https://github.com/quick-1y/obs-animated-avatar",
+    "email": "l0nglife3025@gmail.com"
 }

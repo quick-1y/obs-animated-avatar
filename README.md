@@ -1,59 +1,52 @@
-# OBS Plugin Template
+# Animated Avatar Plugin for OBS
 
-## Introduction
+A zero-overhead, privacy-safe native OBS avatar that reacts to user activity (keyboard, mouse, microphone amplitude) in real time without requiring a separate capture window, external application, or game engine.
 
-The plugin template is meant to be used as a starting point for OBS Studio plugin development. It includes:
+## Requirements
 
-* Boilerplate plugin source code
-* A CMake project file
-* GitHub Actions workflows and repository actions
+- OBS Studio 30.0 or later (documented compatibility floor; confirmed working under OBS 32.2.2)
+- Windows 10/11 x64
+- Visual Studio 2022 (17.x) with the "Desktop development with C++" workload
+- CMake 3.28–3.30 on PATH (the VS 2022-bundled CMake 3.29.5 works but is not on PATH by default — either add it to PATH or invoke it directly, e.g. `"D:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe"`)
+- Windows SDK 10.0.22621 or later
+- Git with submodule support
 
-## Supported Build Environments
+## Building
 
-| Platform  | Tool   |
-|-----------|--------|
-| Windows   | Visual Studio 17 2022 |
-| macOS     | XCode 16.0 |
-| Windows, macOS  | CMake 3.30.5 |
-| Ubuntu 24.04 | CMake 3.28.3 |
-| Ubuntu 24.04 | `ninja-build` |
-| Ubuntu 24.04 | `pkg-config`
-| Ubuntu 24.04 | `build-essential` |
+```
+cmake --preset windows-x64
+cmake --build --preset windows-x64
+```
 
-## Quick Start
+The first configure downloads the pinned OBS 31.1.1 sources and obs-deps prebuilt dependencies (~100-300MB) and builds libobs from source, which can take tens of minutes. Subsequent configures are fast.
 
-An absolute bare-bones [Quick Start Guide](https://github.com/obsproject/obs-plugintemplate/wiki/Quick-Start-Guide) is available in the wiki.
+The build produces `build_x64/RelWithDebInfo/obs-animated-avatar.dll`, built with the RelWithDebInfo configuration linking the Release CRT (`/MD`). A plugin built against the pinned OBS 31.1.1 headers has been confirmed to load correctly under OBS 32.2.2 at runtime.
 
-## Documentation
+## Installation
 
-All documentation can be found in the [Plugin Template Wiki](https://github.com/obsproject/obs-plugintemplate/wiki).
+Stage the build output with:
 
-Suggested reading to get up and running:
+```
+cmake --install build_x64 --config RelWithDebInfo --prefix <staging-dir>
+```
 
-* [Getting started](https://github.com/obsproject/obs-plugintemplate/wiki/Getting-Started)
-* [Build system requirements](https://github.com/obsproject/obs-plugintemplate/wiki/Build-System-Requirements)
-* [Build system options](https://github.com/obsproject/obs-plugintemplate/wiki/CMake-Build-System-Options)
+This produces a self-contained `obs-animated-avatar/` folder:
 
-## GitHub Actions & CI
+```
+obs-animated-avatar/
+  bin/64bit/obs-animated-avatar.dll (+ .pdb)
+  data/...
+```
 
-Default GitHub Actions workflows are available for the following repository actions:
+**Per-plugin layout (recommended, no admin rights required):** copy the staged `obs-animated-avatar/` folder into `C:\ProgramData\obs-studio\plugins\`. At runtime `obs_get_module_data_path()` then resolves to `C:\ProgramData\obs-studio\plugins\obs-animated-avatar\data`, so the default character pack lands at `C:\ProgramData\obs-studio\plugins\obs-animated-avatar\data\characters\default\`.
 
-* `push`: Run for commits or tags pushed to `master` or `main` branches.
-* `pr-pull`: Run when a Pull Request has been pushed or synchronized.
-* `dispatch`: Run when triggered by the workflow dispatch in GitHub's user interface.
-* `build-project`: Builds the actual project and is triggered by other workflows.
-* `check-format`: Checks CMake and plugin source code formatting and is triggered by other workflows.
+**Legacy layout (requires admin rights):** copy `obs-animated-avatar.dll` to `C:/Program Files/obs-studio/obs-plugins/64bit/` and the `data/` contents to `C:/Program Files/obs-studio/data/obs-plugins/obs-animated-avatar/`.
 
-The workflows make use of GitHub repository actions (contained in `.github/actions`) and build scripts (contained in `.github/scripts`) which are not needed for local development, but might need to be adjusted if additional/different steps are required to build the plugin.
+## Provenance
 
-### Retrieving build artifacts
+This project was scaffolded from [`obsproject/obs-plugintemplate`](https://github.com/obsproject/obs-plugintemplate). The template import commit in this repository's history is `9dc088d` ("Initial commit").
 
-Successful builds on GitHub Actions will produce build artifacts that can be downloaded for testing. These artifacts are commonly simple archives and will not contain package installers or installation programs.
+## TODO (before release)
 
-### Building a Release
-
-To create a release, an appropriately named tag needs to be pushed to the `main`/`master` branch using semantic versioning (e.g., `12.3.4`, `23.4.5-beta2`). A draft release will be created on the associated repository with generated installer packages or installation programs attached as release artifacts.
-
-## Signing and Notarizing on macOS
-
-Basic concepts of codesigning and notarization on macOS are explained in the correspodning [Wiki article](https://github.com/obsproject/obs-plugintemplate/wiki/Codesigning-On-macOS) which has a specific section for the [GitHub Actions setup](https://github.com/obsproject/obs-plugintemplate/wiki/Codesigning-On-macOS#setting-up-code-signing-for-github-actions).
+- The macOS `bundleId` in `buildspec.json` is still the template default `com.example.obs-animated-avatar` — no macOS support is planned for the MVP (Windows-first per project constraints), but this should be revisited if macOS support is ever added.
+- `data/locale/ru-RU.ini` is missing; OBS falls back to `en-US` text with a harmless log warning (`Failed to load 'ru-RU' text for module`) when the UI language is Russian. Not blocking; a future localisation pass should add it.

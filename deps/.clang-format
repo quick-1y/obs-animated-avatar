@@ -1,0 +1,7 @@
+# Vendored third-party single-header libraries (nlohmann/json, stb_image).
+# These files are not authored by this project and must not be reformatted
+# to match project style — DisableFormat makes clang-format -style=file
+# treat any file under this directory as already-conforming (no diff),
+# so CI's changed-files clang-format check does not fail on upstream code.
+DisableFormat: true
+SortIncludes: false

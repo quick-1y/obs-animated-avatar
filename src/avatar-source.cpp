@@ -43,7 +43,11 @@ static void *avatar_create(obs_data_t * /* settings */, obs_source_t *source)
 	ctx->placeholder_tex = gs_texture_create(1, 1, GS_RGBA, 1, &ptr, 0);
 	obs_leave_graphics();
 
-	obs_log(LOG_INFO, "[init] avatar source created");
+	if (!ctx->placeholder_tex) {
+		obs_log(LOG_ERROR, "[init] failed to create placeholder texture");
+	} else {
+		obs_log(LOG_INFO, "[init] avatar source created");
+	}
 	return ctx;
 }
 

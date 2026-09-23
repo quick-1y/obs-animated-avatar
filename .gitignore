@@ -20,6 +20,9 @@
 # Exclude lock files
 *.lock.json
 
+# Exclude GSD session claims (per-session, not project state)
+/.planning/*.lock
+
 # Exclude macOS legacy resource forks
 .DS_Store
 
